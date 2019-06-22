@@ -27,32 +27,57 @@
         const canvas = document.querySelector('#canvas');
         const renderer = new THREE.WebGLRenderer({ canvas });
 
+        // set up camera
         const fov = 75;
         const aspect = 2;
         const near = 0.1;
-        const far = 5;
+        const far = 10;
         const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-        camera.position.z = 2;
+        camera.position.z = 5;
 
+        // set up scene
         const scene = new THREE.Scene();
+        // todo lighting
 
-        {
-            const color = 0xFFFFFF;
-            const intensity = 1;
-            const light = new THREE.DirectionalLight(color, intensity);
-            light.position.set(-1, 2, 4);
-            scene.add(light);
+        // the geometry for the logo
+        const geometry = new THREE.Geometry();
+        const vertices = [];
+        const faces = [];
+        geometry.vertices = vertices;
+        geometry.faces = faces;
+
+        // the base set of vertices to be manipulated (draws half the N)
+        const baseVertices = [
+            new THREE.Vector3(-1, -1, 2), // 0
+            new THREE.Vector3(-0.5, -1, 2), // 1
+            new THREE.Vector3(-0.5, 0, 2), // 2
+            new THREE.Vector3(-0.5, 1, 2), // 3
+            new THREE.Vector3(-1, 1, 2), // 4
+            new THREE.Vector3(0.5, 0, 2), // 5
+        ];
+        vertices.push(...baseVertices);
+        // rotate vertices to draw other half of N
+        for (const v of baseVertices) {
+            vertices.push(new THREE.Vector3(v.x * -1, v.y * -1, v.z));
         }
 
-        {
-            const width = 1;
-            const height = 1;
-            const depth = 1;
-            const geometry = new THREE.BoxGeometry(width, height, depth);
-            const material = new THREE.MeshPhongMaterial({ color: 0xFF0000 });
-            const cube = new THREE.Mesh(geometry, material);
-            scene.add(cube);
+        // the base set of faces to be manipulated
+        const baseFaces = [
+            new THREE.Face3(0, 1, 2, null, new THREE.Color(0xFFFF00)),
+            new THREE.Face3(2, 3, 4, null, new THREE.Color(0xFF00FF)),
+            new THREE.Face3(0, 2, 4, null, new THREE.Color(0x00FFFF)),
+            new THREE.Face3(2, 5, 3, null, new THREE.Color(0x00FF00)),
+        ];
+        faces.push(...baseFaces);
+        // create faces for the rotated vertices
+        for (const f of baseFaces) {
+            faces.push(new THREE.Face3(f.a + 6, f.b + 6, f.c + 6, f.normal, f.color));
         }
+
+        // create the logo mesh and add it to the scene
+        const material = new THREE.MeshBasicMaterial({ vertexColors: THREE.FaceColors });
+        const logo = new THREE.Mesh(geometry, material);
+        scene.add(logo);
 
         function resizeRendererToDisplaySize(renderer) {
             const pixelRatio = window.devicePixelRatio;
