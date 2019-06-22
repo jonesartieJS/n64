@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>n64</title>
+    <title>N64</title>
     <style>
         html,
         body {
@@ -64,7 +64,7 @@
             light.position.copy(camera.position.clone().add(vector.multiplyScalar(distance)));
             light.position.y -= 1.75;
             light.position.z = 3;
-        }, false);
+        });
 
         // the geometry for the logo
         const geometry = new THREE.Geometry();
@@ -147,6 +147,26 @@
         logo.rotation.x = Math.PI / 10;
         scene.add(logo);
 
+        // this is fun
+        let code = '';
+        let barrel = false;
+        let smash = false;
+        document.addEventListener('keydown', e => {
+            code += e.key;
+            if (code.endsWith('goldeneye')) {
+                for (face of geometry.faces) {
+                    face.color = new THREE.Color(0xDAA520);
+                }
+                logo.geometry.elementsNeedUpdate = true;
+            } else if (code.endsWith('perfectdark')) {
+                scene.fog = new THREE.Fog('black', 2, 5.5);
+            } else if (code.endsWith('barrelroll')) {
+                barrel = true;
+            } else if (code.endsWith('smash')) {
+                smash = true;
+            }
+        });
+
         function resizeRendererToDisplaySize(renderer) {
             const pixelRatio = window.devicePixelRatio;
             const width = canvas.clientWidth * pixelRatio | 0;
@@ -166,6 +186,21 @@
             }
 
             logo.rotation.y = time * 0.001;
+
+            // handle special fx
+            if (smash) {
+                if (logo.scale.x < 3) {
+                    logo.scale.x += .2;
+                    logo.scale.y += .2;
+                    logo.scale.z += .2;
+                } else {
+                    logo.scale.set(1, 1, 1);
+                    smash = false;
+                }
+            }
+            if (barrel) {
+                logo.rotation.x += 0.02;
+            }
 
             renderer.render(scene, camera);
             requestAnimationFrame(render);
