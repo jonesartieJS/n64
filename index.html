@@ -65,22 +65,22 @@
             new THREE.Vector3(-1, 1, 1), // 4
             new THREE.Vector3(0.5, 0, 1), // 5
         ];
-        // add vertices for the four sides of the logo
-        for (let side = 0; side < 4; side++) {
-            // multiply by -1, -1, 1 to rotate on z axis
-            for (const rotation of [1, -1]) {
+        // rotate on y axis for all four sides of logo
+        for (let yRot = 0; yRot < 4; yRot++) {
+            // rotate on z axis for both halves of N
+            for (let zRot = 0; zRot < 2; zRot++) {
                 for (const v of baseVertices) {
                     vertices.push(
                         new THREE.Vector3()
                             .copy(v)
-                            .multiply(new THREE.Vector3(rotation, rotation, 1))
-                            .applyAxisAngle(new THREE.Vector3(0, 1, 0), (Math.PI / 2) * side)
+                            .applyAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI * zRot)
+                            .applyAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI * yRot / 2)
                     );
                 }
             }
         }
 
-        // draw the four triangles from the base vertices and associated manipulations
+        // draw the four triangles from the base vertices and their associated rotations
         for (let i = 0; i < vertices.length / baseVertices.length; i++) {
             const offset = i * baseVertices.length;
             faces.push(
