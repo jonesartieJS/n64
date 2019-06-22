@@ -27,6 +27,13 @@
         const canvas = document.querySelector('#canvas');
         const renderer = new THREE.WebGLRenderer({ canvas });
 
+        // logo colors
+        const red = new THREE.Color(0xC20D02);
+        const green = new THREE.Color(0x069330);
+        const blue = new THREE.Color(0x011DA9);
+        const yellow = new THREE.Color(0xFFC001);
+        const grey = new THREE.Color(0xC1BED1);
+
         // set up camera
         const fov = 75;
         const aspect = 2;
@@ -37,6 +44,7 @@
 
         // set up scene
         const scene = new THREE.Scene();
+        scene.background = grey;
         // todo lighting
 
         // the geometry for the logo
@@ -90,24 +98,26 @@
         // draw the four triangles from the base vertices and their associated rotations
         for (let i = 0; i < vertices.length / baseVertices.length; i++) {
             const offset = i * baseVertices.length;
+            const other = offset % 4 === 0 || (offset + 1) % 4 === 0;
+            const underside = (i + 1) % 2 === 0;
             faces.push(
                 // the leg
-                new THREE.Face3(0 + offset, 1 + offset, 2 + offset, null, new THREE.Color(0xFFFF00)),
-                new THREE.Face3(2 + offset, 3 + offset, 4 + offset, null, new THREE.Color(0xFF00FF)),
-                new THREE.Face3(0 + offset, 2 + offset, 4 + offset, null, new THREE.Color(0x00FFFF)),
+                new THREE.Face3(0 + offset, 1 + offset, 2 + offset, null, other ? blue : green),
+                new THREE.Face3(2 + offset, 3 + offset, 4 + offset, null, other ? blue : green),
+                new THREE.Face3(0 + offset, 2 + offset, 4 + offset, null, other ? blue : green),
                 // half the diagonal
-                new THREE.Face3(2 + offset, 5 + offset, 3 + offset, null, new THREE.Color(0x00FF00)),
+                new THREE.Face3(2 + offset, 5 + offset, 3 + offset, null, other ? blue : green),
                 // the top
-                new THREE.Face3(4 + offset, 3 + offset, 7 + offset, null, new THREE.Color(0x00FF00)),
-                new THREE.Face3(4 + offset, 7 + offset, 6 + offset, null, new THREE.Color(0xFF00FF)),
+                new THREE.Face3(4 + offset, 3 + offset, 7 + offset, null, yellow),
+                new THREE.Face3(4 + offset, 7 + offset, 6 + offset, null, yellow),
                 // inside diagonal
-                new THREE.Face3(5 + offset, 8 + offset, 3 + offset, null, new THREE.Color(0xFF00FF)),
-                new THREE.Face3(3 + offset, 8 + offset, 7 + offset, null, new THREE.Color(0x00FFFF)),
+                new THREE.Face3(5 + offset, 8 + offset, 3 + offset, null, underside ? (other ? red : blue) : other ? green : red),
+                new THREE.Face3(3 + offset, 8 + offset, 7 + offset, null, underside ? (other ? red : blue) : other ? green : red),
                 // back diagonal
-                new THREE.Face3(7 + offset, 8 + offset, 9 + offset, null, new THREE.Color(0xFF0000)),
+                new THREE.Face3(7 + offset, 8 + offset, 9 + offset, null, other ? blue : green),
                 // inside leg
-                new THREE.Face3(1 + offset, 10 + offset, 2 + offset, null, new THREE.Color(0x0000FF)),
-                new THREE.Face3(10 + offset, 9 + offset, 2 + offset, null, new THREE.Color(0xFFFF00)),
+                new THREE.Face3(1 + offset, 10 + offset, 2 + offset, null, other ? green : blue),
+                new THREE.Face3(10 + offset, 9 + offset, 2 + offset, null, other ? green : blue),
             );
         }
 
