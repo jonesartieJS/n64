@@ -45,8 +45,26 @@
 
         // set up scene
         const scene = new THREE.Scene();
-        scene.background = grey;
-        // todo lighting
+        scene.add(new THREE.AmbientLight(grey, 1));
+        const light = new THREE.PointLight(grey, 0.8);
+        light.position.set(1, -0.5, 3);
+        scene.add(light);
+
+        // make the point light follow the mouse
+        // https://stackoverflow.com/a/13091694
+        document.addEventListener('mousemove', e => {
+            e.preventDefault();
+            let vector = new THREE.Vector3(
+                e.clientX / window.innerWidth * 2 - 1,
+                -e.clientY / window.innerHeight * 2 + 1,
+                0.5);
+            vector.unproject(camera);
+            vector.sub(camera.position).normalize();
+            let distance = -camera.position.z / vector.z;
+            light.position.copy(camera.position.clone().add(vector.multiplyScalar(distance)));
+            light.position.y -= 1.75;
+            light.position.z = 3;
+        }, false);
 
         // the geometry for the logo
         const geometry = new THREE.Geometry();
@@ -123,7 +141,8 @@
         }
 
         // create the logo mesh and add it to the scene
-        const material = new THREE.MeshBasicMaterial({ vertexColors: THREE.FaceColors });
+        geometry.computeFaceNormals();
+        const material = new THREE.MeshPhongMaterial({ vertexColors: THREE.FaceColors });
         const logo = new THREE.Mesh(geometry, material);
         logo.rotation.x = Math.PI / 10;
         scene.add(logo);
